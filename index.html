@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe Game 🎮</title>
+  <style>
+ /* General body styling */
+body {
+  background: #0f0f0f;
+  color: #00ffea;
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea, 0 0 20px #00ffea;
+}
+
+/* Board styling */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  border: 2px solid #00ffea;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px #00ffea, 0 0 40px #00ffea, 0 0 60px #00ffea;
+}
+
+/* Cell styling */
+.cell {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #00ffea;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 48px;
+  cursor: pointer;
+  background-color: rgba(15, 15, 15, 0.9);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.cell:hover {
+  background-color: rgba(15, 15, 15, 1);
+  box-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea;
+}
+
+.x {
+  color: #ff0057;
+  animation: glow-pink 1.5s infinite alternate;
+  text-shadow: 0 0 10px #ff0057, 0 0 20px #ff0057, 0 0 30px #ff0057;
+}
+
+.o {
+  color: #00ffea;
+  animation: glow-cyan 1.5s infinite alternate;
+  text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea, 0 0 30px #00ffea;
+}
+
+@keyframes glow-pink {
+  from {
+    text-shadow: 0 0 10px #ff0057, 0 0 20px #ff0057, 0 0 30px #ff0057;
+  }
+  to {
+    text-shadow: 0 0 20px #ff0057, 0 0 30px #ff0057, 0 0 40px #ff0057;
+  }
+}
+
+@keyframes glow-cyan {
+  from {
+    text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea, 0 0 30px #00ffea;
+  }
+  to {
+    text-shadow: 0 0 20px #00ffea, 0 0 30px #00ffea, 0 0 40px #00ffea;
+  }
+}
+
+/* Controls and scores styling */
+.controls, .scores {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  width: 300px;
+  flex-wrap: wrap;
+}
+
+.score {
+  margin: 0 20px;
+  text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea;
+}
+
+/* Header styling */
+h1 {
+  color: #ff0057;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #ff0057, 0 0 20px #ff0057, 0 0 30px #ff0057;
+  animation: glow-pink 1.5s infinite alternate;
+}
+
+/* Select box and label styling */
+select {
+  background-color: #333;
+  color: #00ffea;
+  border: 1px solid #00ffea;
+  padding: 5px;
+  margin: 0 10px;
+  border-radius: 5px;
+  text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea;
+}
+
+label {
+  margin: 0 10px;
+  text-shadow: 0 0 5px #00ffea, 0 0 10px #00ffea;
+}
+
+/* Footer styling */
+footer {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #ff0057;
+  text-shadow: 0 0 10px #ff0057, 0 0 20px #ff0057, 0 0 30px #ff0057;
+  animation: glow-pink 1.5s infinite alternate;
+}
+
+footer a {
+  color: #00ffea;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: #ff0057;
+  text-shadow: 0 0 5px #ff0057, 0 0 10px #ff0057;
+}
+
+/* DMCA badge styling */
+.dmca-badge img {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.dmca-badge img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #ff0057, 0 0 20px #ff0057, 0 0 30px #ff0057;
+}
+
+/* Sidebar styling */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px; /* Initially hidden */
+  height: 100vh;
+  width: 200px;
+  background-color: #111;
+  color: #00ffea;
+  box-shadow: 0 0 10px #00ffea;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  padding: 20px;
+  z-index: 1000;
+}
+
+/* Show sidebar when active */
+.sidebar.active {
+  left: 0;
+}
+
+/* Inner sidebar links */
+.sidebar a {
+  display: block;
+  padding: 10px 15px; /* Adjusted padding */
+  color: #00ffea;
+  text-decoration: none;
+  margin-bottom: 10px; /* Reduced margin */
+  border-radius: 8px; /* Slightly rounded corners */
+  font-size: 16px; /* Slightly larger font size */
+  font-weight: 500;
+  transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+/* Hover and active state for sidebar links */
+.sidebar a:hover,
+.sidebar a:focus {
+  background-color: #00ffea;
+  color: #111;
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+/* Sidebar toggle button */
+.toggle-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background-color: #00ffea;
+  color: #0f0f0f;
+  border: none;
+  padding: 10px 15px; /* Original size */
+  cursor: pointer;
+  z-index: 1001;
+  font-size: 18px; /* Original size */
+  border-radius: 5px;
+  box-shadow: 0 0 10px #00ffea;
+  transition: opacity 0.3s ease;
+}
+
+/* Hide toggle button when sidebar is open */
+.sidebar.active ~ .toggle-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Overlay to detect clicks outside the sidebar */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.overlay.active {
+  display: block;
+}
+
+/* Adjust styling for touch devices */
+@media (pointer: coarse) {
+  .toggle-btn {
+    font-size: 20px;
+    padding: 12px 18px;
+  }
+  
+  .sidebar a {
+    font-size: 18px; /* Larger font size for touch devices */
+    padding: 12px 18px; /* Increased padding for touch targets */
+  }
+}
+</style>
+</head>
+<body>
+  <!-- Sidebar HTML -->
+  <div class="sidebar" id="sidebar">
+    <h2>Menu</h2>
+    <a href="#home">Home</a>
+    <a href="https://namnijamni96.github.io/About-game/">About</a>
+    <a href="mailto:rajeshkumar8810362760@gmail.com">Contact developer</a>
+    <a href="https://namnijamni96.github.io/Licence-/">License</a>
+  </div>
+  
+  <!-- Toggle button for sidebar -->
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- Existing content -->
+  <h1>Tic Tac Toe Game</h1>
+  <div class="controls">
+    <label for="mode">Choose Mode: </label>
+    <select id="mode">
+      <option value="player_vs_computer">Player vs Computer</option>
+      <option value="player_vs_player">Player vs Player</option>
+    </select>
+    <label for="difficulty">Choose Difficulty: </label>
+    <select id="difficulty">
+      <option value="easy">Easy</option>
+      <option value="normal">Normal</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+  <div class="scores">
+    <div id="playerXScore" class="score">Player: 0</div>
+    <div id="playerOScore" class="score">Computer: 0</div>
+  </div>
+  <div class="board" id="board">
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+    <div class="cell" tabindex="0"></div>
+  </div>
+  <footer>
+    Thank you for playing the game! Follow me on Instagram 🆔 <a href="https://www.instagram.com/its_sketch_artist__" target="_blank">its_sketch_artist__</a>. (Game created by Naman).
+  </footer>
+<a href="//www.dmca.com/Protection/Status.aspx?ID=a4104b2e-6103-498c-b7eb-37bd9fe8fd76" title="DMCA.com Protection Status" class="dmca-badge">
+      <img src="https://images.dmca.com/Badges/dmca_protected_sml_120n.png?ID=a4104b2e-6103-498c-b7eb-37bd9fe8fd76" alt="DMCA.com Protection Status" />
+    </a>
+  <script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"></script>
+
+   <script>
+  // Your JavaScript for Tic Tac Toe
+
+let currentPlayer = 'X';
+let board = [
+  ['', '', ''],
+  ['', '', ''],
+  ['', '', '']
+];
+let isPlayerTurn = true;
+let playerXScore = 0;
+let playerOScore = 0;
+let mode = 'player_vs_computer';
+
+function handleClick(row, col) {
+  if (isPlayerTurn && board[row][col] === '') {
+    board[row][col] = currentPlayer;
+    render();
+    let result = checkGameState();
+    if (result) {
+      handleGameEnd(result);
+    } else {
+      if (mode === 'player_vs_computer') {
+        currentPlayer = 'O';
+        isPlayerTurn = false;
+        setTimeout(computerMove, 500);
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      }
+    }
+  }
+}
+
+function computerMove() {
+  let difficulty = document.getElementById('difficulty').value;
+  let move;
+
+  switch (difficulty) {
+    case 'easy':
+      move = getRandomMove();
+      break;
+    case 'normal':
+      move = getNormalMove();
+      break;
+    case 'hard':
+      move = getBestMove();
+      break;
+  }
+
+  if (move) {
+    board[move[0]][move[1]] = currentPlayer;
+    render();
+    let result = checkGameState();
+    if (result) {
+      handleGameEnd(result);
+    } else {
+      currentPlayer = 'X';
+      isPlayerTurn = true;
+    }
+  }
+}
+
+function getRandomMove() {
+  let availableMoves = [];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '') {
+        availableMoves.push([i, j]);
+      }
+    }
+  }
+  if (availableMoves.length > 0) {
+    return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+  }
+  return null;
+}
+
+function getNormalMove() {
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '') {
+        // Check if computer can win
+        board[i][j] = currentPlayer;
+        if (checkGameState() === currentPlayer) {
+          board[i][j] = '';
+          return [i, j];
+        }
+        board[i][j] = '';
+      }
+    }
+  }
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '') {
+        // Block the player from winning
+        board[i][j] = 'X';
+        if (checkGameState() === 'X') {
+          board[i][j] = '';
+          return [i, j];
+        }
+        board[i][j] = '';
+      }
+    }
+  }
+  return getRandomMove();
+}
+
+function getBestMove() {
+  let bestScore = -Infinity;
+  let move;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '') {
+        board[i][j] = currentPlayer;
+        let score = minimax(board, 0, false);
+        board[i][j] = '';
+        if (score > bestScore) {
+          bestScore = score;
+          move = [i, j];
+        }
+      }
+    }
+  }
+  return move;
+}
+
+function minimax(board, depth, isMaximizing) {
+  let result = checkGameState();
+  if (result !== null) {
+    if (result === 'X') return -10 + depth;
+    if (result === 'O') return 10 - depth;
+    return 0;
+  }
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] === '') {
+          board[i][j] = 'O';
+          let score = minimax(board, depth + 1, false);
+          board[i][j] = '';
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] === '') {
+          board[i][j] = 'X';
+          let score = minimax(board, depth + 1, true);
+          board[i][j] = '';
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+    }
+    return bestScore;
+  }
+}
+
+function checkGameState() {
+  for (let i = 0; i < 3; i++) {
+    if (board[i][0] !== '' && board[i][0] === board[i][1] && board[i][0] === board[i][2]) {
+      return board[i][0];
+    }
+    if (board[0][i] !== '' && board[0][i] === board[1][i] && board[0][i] === board[2][i]) {
+      return board[0][i];
+    }
+  }
+  if (board[0][0] !== '' && board[0][0] === board[1][1] && board[0][0] === board[2][2]) {
+    return board[0][0];
+  }
+  if (board[0][2] !== '' && board[0][2] === board[1][1] && board[0][2] === board[2][0]) {
+    return board[0][2];
+  }
+  if (checkDraw()) {
+    return 'draw';
+  }
+  return null;
+}
+
+function checkDraw() {
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '') {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function render() {
+  const boardElement = document.getElementById('board');
+  boardElement.innerHTML = '';
+  board.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      const cellElement = document.createElement('div');
+      cellElement.classList.add('cell');
+      cellElement.setAttribute('tabindex', '0');
+      cellElement.textContent = cell;
+      if (cell === 'X') {
+        cellElement.classList.add('x');
+      } else if (cell === 'O') {
+        cellElement.classList.add('o');
+      }
+      cellElement.onclick = () => handleClick(rowIndex, colIndex);
+      cellElement.onkeypress = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          handleClick(rowIndex, colIndex);
+        }
+      };
+      boardElement.appendChild(cellElement);
+    });
+  });
+}
+
+function handleGameEnd(result) {
+  if (result === 'draw') {
+    alert("It's a draw!");
+  } else {
+    alert(`${result} wins!`);
+    if (result === 'X') {
+      playerXScore++;
+    } else {
+      playerOScore++;
+    }
+    updateScores();
+  }
+  resetGame();
+}
+
+function updateScores() {
+  if (mode === 'player_vs_computer') {
+    document.getElementById('playerXScore').textContent = `Player: ${playerXScore}`;
+    document.getElementById('playerOScore').textContent = `Computer: ${playerOScore}`;
+  } else {
+    document.getElementById('playerXScore').textContent = `Player X: ${playerXScore}`;
+    document.getElementById('playerOScore').textContent = `Player O: ${playerOScore}`;
+  }
+}
+
+function resetScores() {
+  playerXScore = 0;
+  playerOScore = 0;
+  updateScores();
+}
+
+// Function to reset the game
+function resetGame() {
+  board = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
+  ];
+  currentPlayer = 'X';
+  isPlayerTurn = true;
+  render();
+}
+
+// Function to reset scores
+function resetScores() {
+  playerXScore = 0;
+  playerOScore = 0;
+  updateScores();
+}
+
+// Function to switch between game modes
+function switchMode() {
+  mode = document.getElementById('mode').value;
+  const difficultySelect = document.getElementById('difficulty');
+
+  if (mode === 'player_vs_computer') {
+    difficultySelect.disabled = false;
+  } else {
+    difficultySelect.disabled = true;
+    // Reset scores when switching to player vs player mode
+    resetScores();
+  }
+
+  resetGame(); // Reset the game when the mode changes
+}
+
+// Event listener for changing the difficulty
+document.getElementById('difficulty').addEventListener('change', function() {
+  // Reset the game board and scores when difficulty changes within player_vs_computer mode
+  if (mode === 'player_vs_computer') {
+    resetGame();
+    resetScores();
+  }
+});
+
+// Event listener for changing the mode
+document.getElementById('mode').addEventListener('change', switchMode);
+
+// Sidebar and toggle button logic
+const toggleBtn = document.querySelector('.toggle-btn');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.createElement('div');
+
+// Create and append the overlay
+overlay.classList.add('overlay');
+document.body.appendChild(overlay);
+
+// Function to open the sidebar
+function openSidebar() {
+  sidebar.classList.add('active');
+  overlay.classList.add('active');
+}
+
+// Function to close the sidebar
+function closeSidebar() {
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+}
+
+// Event listener to handle the toggle button click
+toggleBtn.addEventListener('click', () => {
+  if (sidebar.classList.contains('active')) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+});
+
+// Event listener to handle clicks on the overlay
+overlay.addEventListener('click', () => {
+  closeSidebar();
+});
+
+// Ensure the sidebar and overlay are hidden when the page loads
+closeSidebar();
+
+// Handle window resize to ensure the sidebar is hidden on smaller screens
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    closeSidebar();
+  }
+});
+
+// Handle the sidebar toggle when switching modes
+document.getElementById('mode').addEventListener('change', switchMode);
+
+render();
+</script>
+</body>
+</HTML>
